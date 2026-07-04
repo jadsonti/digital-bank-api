@@ -2,7 +2,9 @@ package com.jadson.digitalbank.controller;
 
 import com.jadson.digitalbank.dto.ContaResponse;
 import com.jadson.digitalbank.dto.CriarContaRequest;
+import com.jadson.digitalbank.dto.MovimentacaoResponse;
 import com.jadson.digitalbank.service.ContaService;
+import com.jadson.digitalbank.service.MovimentacaoQueryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +22,11 @@ import java.util.List;
 public class ContaController {
 
     private final ContaService contaService;
+    private final MovimentacaoQueryService movimentacaoQueryService;
 
-    public ContaController(ContaService contaService) {
+    public ContaController(ContaService contaService, MovimentacaoQueryService movimentacaoQueryService) {
         this.contaService = contaService;
+        this.movimentacaoQueryService = movimentacaoQueryService;
     }
 
     @PostMapping
@@ -39,5 +43,10 @@ public class ContaController {
     @GetMapping("/{id}")
     public ContaResponse buscarPorId(@PathVariable Long id) {
         return contaService.buscarPorId(id);
+    }
+
+    @GetMapping("/{id}/movimentacoes")
+    public List<MovimentacaoResponse> movimentacoes(@PathVariable Long id) {
+        return movimentacaoQueryService.buscarPorContaId(id);
     }
 }
