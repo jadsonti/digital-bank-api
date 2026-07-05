@@ -20,13 +20,16 @@ public class TransferenciaService {
 
     private final ContaRepository contaRepository;
     private final MovimentacaoRepository movimentacaoRepository;
+    private final NotificacaoService notificacaoService;
 
     public TransferenciaService(
             ContaRepository contaRepository,
-            MovimentacaoRepository movimentacaoRepository
+            MovimentacaoRepository movimentacaoRepository,
+            NotificacaoService notificacaoService
     ) {
         this.contaRepository = contaRepository;
         this.movimentacaoRepository = movimentacaoRepository;
+        this.notificacaoService = notificacaoService;
     }
 
     @Transactional
@@ -60,7 +63,7 @@ public class TransferenciaService {
         movimentacaoRepository.save(new Movimentacao(
                 idTransferencia, destino.getId(), origem.getId(), TipoMovimentacao.CREDITO, requisicao.valor()));
 
-        return new TransferenciaResponse(
+        TransferenciaResponse resposta = new TransferenciaResponse(
                 idTransferencia,
                 origem.getId(),
                 destino.getId(),
@@ -69,5 +72,8 @@ public class TransferenciaService {
                 destino.getSaldo(),
                 LocalDateTime.now()
         );
+
+        notificacaoService.notificarTransferenciaConcluida(origem, destino, requisicao.valor(), idTransferencia);
+        return resposta;
     }
 }
